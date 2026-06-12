@@ -1,31 +1,43 @@
-import { useState } from "react";
 import "./TreeNode.css";
 
-function TreeNode({ node, selectedFile, onFileSelect, depth = 0 }) {
-  const [isOpen, setIsOpen] = useState(false);
-
+function TreeNode({
+  node,
+  selectedFile,
+  onFileSelect,
+  openFolders,
+  toggleFolder,
+  focusedId,
+  setFocusedId,
+  depth = 0,
+}) {
   const isSelected = selectedFile?.id === node.id;
+  const isFocused = focusedId === node.id;
   const isFolder = node.type === "folder";
+  const isOpen = openFolders.has(node.id);
   const hasChildren = isFolder && node.children?.length > 0;
 
   const handleClick = () => {
     if (isFolder) {
-      setIsOpen((prev) => !prev);
+      toggleFolder(node.id);
     } else {
       onFileSelect(node);
     }
+    setFocusedId(node.id);
   };
 
   return (
     <div className="tree-node">
       <div
-        className={`tree-node__row ${isSelected ? "tree-node__row--selected" : ""} ${isFolder ? "tree-node__row--folder" : ""}`}
+        className={`
+          tree-node__row
+          ${isSelected ? "tree-node__row--selected" : ""}
+          ${isFocused ? "tree-node__row--focused" : ""}
+          ${isFolder ? "tree-node__row--folder" : ""}
+        `}
         style={{ paddingLeft: `${12 + depth * 16}px` }}
         onClick={handleClick}
         tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") handleClick();
-        }}
+        onFocus={() => setFocusedId(node.id)}
       >
         {isFolder && (
           <span
@@ -41,7 +53,6 @@ function TreeNode({ node, selectedFile, onFileSelect, depth = 0 }) {
 
         <span className="tree-node__name">{node.name}</span>
 
-        {/* File size — only for files */}
         {!isFolder && <span className="tree-node__size">{node.size}</span>}
       </div>
 
@@ -54,6 +65,10 @@ function TreeNode({ node, selectedFile, onFileSelect, depth = 0 }) {
                 node={child}
                 selectedFile={selectedFile}
                 onFileSelect={onFileSelect}
+                openFolders={openFolders}
+                toggleFolder={toggleFolder}
+                focusedId={focusedId}
+                setFocusedId={setFocusedId}
                 depth={depth + 1}
               />
             ))

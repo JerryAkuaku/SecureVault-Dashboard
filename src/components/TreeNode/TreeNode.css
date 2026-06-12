@@ -79,3 +79,8 @@
   align-items: center;
   font-style: italic;
 }
+
+.tree-node__row--focused {
+  outline: 1px solid var(--color-accent);
+  outline-offset: -1px;
+}
